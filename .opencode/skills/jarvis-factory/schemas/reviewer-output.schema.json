@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reviewer output",
+  "type": "object",
+  "required": ["task_id", "role", "verdict", "security_verdict", "architecture_verdict", "scope", "findings", "summary"],
+  "properties": {
+    "task_id": {"type": "string"},
+    "role": {"type": "string", "enum": ["reviewer"]},
+    "verdict": {"type": "string", "enum": ["APPROVE", "REQUEST_CHANGES", "BLOCK"]},
+    "security_verdict": {"type": "string", "enum": ["PASS", "FAIL"]},
+    "architecture_verdict": {"type": "string", "enum": ["PASS", "CONCERNS", "FAIL"]},
+    "scope": {
+      "type": "object",
+      "required": ["base", "files_reviewed"],
+      "properties": {"base": {"type": "string"}, "head": {"type": "string"}, "files_reviewed": {"type": "array", "items": {"type": "string"}, "minItems": 1}}
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "severity", "file", "description"],
+        "properties": {
+          "id": {"type": "string"},
+          "category": {"type": "string", "enum": ["correctness", "security", "architecture", "maintainability", "tests", "performance"]},
+          "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+          "file": {"type": "string"},
+          "line": {"type": ["integer", "null"]},
+          "description": {"type": "string"},
+          "recommendation": {"type": "string"}
+        }
+      }
+    },
+    "summary": {"type": "string"}
+  }
+}

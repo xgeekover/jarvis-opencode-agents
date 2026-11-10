@@ -1,0 +1,20 @@
+{
+  "id": "my-app",
+  "name": "My App",
+  "root": "C:/work/my-app",
+  "default_branch": "main",
+  "commands": {
+    "build": "mvn -B --no-transfer-progress -DskipTests package",
+    "test": "mvn -B --no-transfer-progress test",
+    "lint": "npm --prefix frontend run lint",
+    "integration_test": null
+  },
+  "gate_overrides": {},
+  "_gate_overrides_example": {
+    "static_analysis": {
+      "not_applicable": "No linter in this repository yet (decided by <human>, <date>)"
+    }
+  },
+  "confirmed_by": "<human who confirmed these commands>",
+  "analysed_at": "2026-11-10T09:00:00+09:00"
+}

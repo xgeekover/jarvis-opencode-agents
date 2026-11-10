@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Developer output",
+  "type": "object",
+  "required": ["task_id", "role", "status", "workdir", "files_changed", "tests_added", "commands_run", "summary"],
+  "properties": {
+    "task_id": {"type": "string"},
+    "role": {"type": "string", "enum": ["developer"]},
+    "status": {"type": "string", "enum": ["COMPLETE", "PARTIAL", "BLOCKED", "ERROR"]},
+    "workdir": {"type": "string"},
+    "files_changed": {"type": "array", "items": {"type": "string"}},
+    "tests_added": {"type": "array", "items": {"type": "string"}},
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["cmd", "exit_code"],
+        "properties": {"cmd": {"type": "string"}, "exit_code": {"type": ["integer", "null"]}, "summary": {"type": "string"}}
+      }
+    },
+    "summary": {"type": "string"},
+    "known_limitations": {"type": "array", "items": {"type": "string"}},
+    "questions": {"type": "array", "items": {"type": "string"}}
+  }
+}

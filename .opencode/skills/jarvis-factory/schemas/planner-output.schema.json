@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Planner output (the Queen saves its requirements part as requirements.json and its plan part as plan.json)",
+  "type": "object",
+  "required": [
+    "task_id",
+    "role",
+    "status",
+    "requirements",
+    "plan"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "planner"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "COMPLETE",
+        "NEEDS_CLARIFICATION",
+        "ERROR"
+      ]
+    },
+    "requirements": {
+      "type": "object"
+    },
+    "plan": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

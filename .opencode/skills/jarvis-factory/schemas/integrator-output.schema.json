@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Integrator output",
+  "type": "object",
+  "required": ["task_id", "role", "status", "diff_summary", "scope_violations", "merge_check", "integration_tests", "acceptance_criteria", "blockers"],
+  "properties": {
+    "task_id": {"type": "string"},
+    "role": {"type": "string", "enum": ["integrator", "queen"]},
+    "status": {"type": "string", "enum": ["READY", "NOT_READY", "ERROR"]},
+    "diff_summary": {
+      "type": "object",
+      "required": ["files"],
+      "properties": {"files": {"type": "array", "items": {"type": "string"}}, "insertions": {"type": ["integer", "null"]}, "deletions": {"type": ["integer", "null"]}}
+    },
+    "scope_violations": {"type": "array", "items": {"type": "string"}},
+    "merge_check": {
+      "type": "object",
+      "required": ["performed"],
+      "properties": {"performed": {"type": "boolean"}, "target": {"type": "string"}, "conflicts": {"type": "array", "items": {"type": "string"}}}
+    },
+    "integration_tests": {
+      "type": "object",
+      "required": ["performed"],
+      "properties": {"performed": {"type": "boolean"}, "command": {"type": ["string", "null"]}, "exit_code": {"type": ["integer", "null"]}, "summary": {"type": "string"}}
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["criterion", "met", "evidence"],
+        "properties": {"criterion": {"type": "string"}, "met": {"type": "boolean"}, "evidence": {"type": "string"}}
+      }
+    },
+    "delivery_notes": {"type": "string"},
+    "proposed_commit_message": {"type": "string"},
+    "blockers": {"type": "array", "items": {"type": "string"}}
+  }
+}

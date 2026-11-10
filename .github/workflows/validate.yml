@@ -1,0 +1,63 @@
+name: validate
+
+# Static checks + "does OpenCode really load it" on Windows and Linux,
+# against the OpenCode version this package was built with (1.18.34) and the newest 1.x checked (1.19.5).
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: ${{ matrix.os }} / opencode ${{ matrix.opencode }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        opencode: ["1.18.34", "1.19.5"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install OpenCode
+        run: npm install -g opencode-ai@${{ matrix.opencode }}
+      - name: Static checks
+        run: python tools/validate.py
+      - name: Install into a temp project and load it with OpenCode
+        run: python tools/validate.py --opencode
+      - name: Installer on Windows PowerShell 5.1 (install, re-run, uninstall)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $t = Join-Path $env:RUNNER_TEMP 'ps51-project'
+          New-Item -ItemType Directory -Path $t -Force | Out-Null
+          .\install\install.ps1 -Target $t -WithTemplates
+          foreach ($f in @('.opencode\agents\jarvis-queen.md', '.opencode\skills\tdd\SKILL.md', '.opencode\commands\jarvis-feature.md', 'opencode.json', 'AGENTS.md')) {
+            if (-not (Test-Path (Join-Path $t $f))) { throw "missing after install: $f" }
+          }
+          .\install\install.ps1 -Target $t
+          .\install\install.ps1 -Target $t -Uninstall
+          if (Test-Path (Join-Path $t '.opencode\agents\jarvis-queen.md')) { throw 'uninstall left jarvis-queen.md behind' }
+          $g = Join-Path $env:RUNNER_TEMP 'ps51-global'
+          .\install\install.ps1 -Global -ConfigDir $g -Only skills
+          if (Test-Path (Join-Path $g 'agents')) { throw '-Only skills installed agents' }
+          if (-not (Test-Path (Join-Path $g 'skills\tdd\SKILL.md'))) { throw '-Only skills did not install skills' }
+      - name: Installer on bash (install, re-run, uninstall)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+          t="$RUNNER_TEMP/sh-project"; mkdir -p "$t"
+          bash install/install.sh --target "$t" --with-templates
+          test -f "$t/.opencode/agents/jarvis-queen.md" && test -f "$t/opencode.json" && test -f "$t/AGENTS.md"
+          bash install/install.sh --target "$t" | grep -q 'skipped (already exists'
+          bash install/install.sh --target "$t" --uninstall
+          test ! -e "$t/.opencode/agents/jarvis-queen.md"
